@@ -24,6 +24,14 @@ from scipy import sparse
 import numpy as np
 import random
 import math
+
+## DMERA class for 1D translationally invariant, scale-invariant ansatz
+class dmera1:
+    def __init__(self):
+        self.s = 2 # Scale
+        self.p = 2 # Periodicity
+        self.D = 2 # Depth per scale
+
 ## Return True if circuit1 and circuit 2 commute. Return False otherwise.
 def commute(circuit1, circuit2):
     if len(set(circuit1) & set(circuit2))==0:
