@@ -25,13 +25,207 @@ import numpy as np
 import random
 import math
 
+# DMERA class for 2D translationally invariant, scale-invariant ansatz
+## Change the coordinates from a list format to the tuple format.
+class dmera2:
+    def __init__(self,scale,px,py,depth):
+        self.scale = scale
+        self.periodx = px
+        self.periody = py
+        self.depth = depth
+        self.n = depth * px * py
+        self.gates = [[[np.identity(4)] * depth] * px] * py
+
+    def gate(self,layer,Supp):
+        return np.identity(4)
+
+    def pcc(self, Supp):
+        xs = [site[0] for site in Supp]
+        ys = [site[1] for site in Supp]
+        if (max(xs) > pow(2,self.scale)) or (min(xs)<0) or (max(ys) > pow(2, self.scale)) or (min(ys)<0):
+            print('pcc warning : Operator support range out of bound.')
+        circuits = {}
+        for s in range(1, self.scale+1):
+            for d in range(1, self.depth+1):
+                relevant_circuits, Supp = self.Supp_update(self.list_gates(s,d),Supp)
+                circuits[(s,d)] = relevant_circuits
+        return circuits
+
+    def Supp_update(self, gates, Supp):
+        relevant_gates = []
+        for gate in gates:
+            if len(set(gate) & set(Supp)) != 0:
+                relevant_gates.append(gate)
+                Supp = list(set(gate) | set(Supp))
+        return relevant_gates, Supp
+
+    def list_gates(self, s,d):
+        if self.scale < s:
+            print('list_gates Warning : scale range out of bound.')
+        if self.depth < d:
+            print('list_gates Warning : scale range out of bound.')
+        listed_gates = []
+
+        l = pow(2,self.scale)
+        spacing = pow(2,s)
+        range_itt = range(int(pow(2,self.scale - s)))
+        # 
+        if d%4 == 0:
+            listed_gates = [[[spacing * i % l , spacing * j % l], [(spacing * i + int(spacing / 2)) % l, spacing * j % l]] for i,j in zip(range_itt, range_itt)]
+        elif d%4 == 1:
+            listed_gates = [[[spacing * i % l , spacing * j % l], [spacing * i % l, (spacing * j + int(spacing / 2)) % l]] for i,j in zip(range_itt, range_itt)]
+        elif d%4 == 2:
+            listed_gates = [[[(spacing * i + int(spacing / 2)) % l, spacing * j % l], [spacing * (i + 1) % l, spacing * j % l]] for i,j in zip(range_itt, range_itt)]
+        else:
+            listed_gates = [[[spacing * i % l, (spacing * j + int(spacing / 2)) % l], [spacing * i % l, spacing * (j + 1) % l]] for i,j in zip(range_itt, range_itt)]
+        return listed_gates
+
+            
 ## DMERA class for 1D translationally invariant, scale-invariant ansatz
 class dmera1:
-    def __init__(self):
-        self.s = 2 # Scale
-        self.p = 2 # Periodicity
-        self.D = 2 # Depth per scale
+    # Initialize with the number of scales, peridocity in x direction, and depth.
+    def __init__(self, scale, periodicity, depth):
+        self.scale = scale # Scale
+        self.period = periodicity # Periodicity
+        self.depth = depth # Depth per scale
+        self.n = depth * periodicity # Number of SU(4) that needs to be specified.
+        self.gates = [[np.identity(4)] * depth] * periodicity # Initialize all the gates to identity.
 
+    # Given a layer specified by (s,d), and the support of the gate, returns SU(4).
+    ## Need to update. Right now this method only outputs identity.
+    def gate(self, layer,Supp):
+        return np.identity(4)
+        
+    # Past causal cone of an observable supported on Supp.
+    # The output is a dictionary which, given (s,d), outputs a list of support of
+    # the gates
+    def pcc(self,Supp):
+        if (max(Supp) > pow(2,self.scale)) or (min(Supp)<0):
+            print('pcc Warning : Operator support range out of bound.')
+        circuits = {}
+        for s in range(1,self.scale+1):
+            for d in range(1,self.depth+1):
+                relevant_circuits, Supp = self.Supp_update(self.list_gates(s,d), Supp)
+                circuits[(s,d)] = relevant_circuits
+        return circuits
+
+    def Supp_update(self,gates, Supp):
+        relevant_gates = []
+        for gate in gates:
+        # If the support of the circuit and Supp has a nontrivial intersection,
+        # append the circuit to the list of relevant circuits, and update Supp accordingly.
+            if len(set(gate) & set(Supp)) != 0:
+                relevant_gates.append(gate)
+                Supp = list(set(gate) | set(Supp))
+        return relevant_gates, Supp
+    
+    # list_gates : Outputs all the gates on the (s,d)-th layer. 
+    def list_gates(self, s, d):
+        if self.scale < s:
+            print('list_gates Warning : scale range out of bound.')
+        if self.depth < d:
+            print('list_gates Warning : depth range out of bound.')
+        listed_gates = []
+        if d%2 == 0:
+            for i in range(pow(2,self.scale-s)):
+                listed_gates.append([pow(2,s) * i % pow(2,self.scale), (pow(2,s) * i + pow(2,s-1)) % pow(2,self.scale)])
+        else:
+            for i in range(pow(2,self.scale-s)):
+                listed_gates.append([(pow(2,s)*i + pow(2,s-1)) % pow(2,self.scale), (pow(2,s)*(i+1)) % pow(2,self.scale)])
+        return listed_gates
+
+    # Global assignment that is sufficient for nearest-neighbor observables.
+    def assignment(self):
+        n = pow(2,self.scale)
+        assignment = {i : 1 for i in range(n)}
+        physqubits_num = 1
+        for i in range(n):
+            Supp = [i, (i+1) % n]
+            circuit = self.pcc(Supp)
+            layers = []
+            for layer in circuit:
+                layers = layers + [layer]
+            for layer in layers:
+                qubits_layer = []
+                for gate in circuit[layer]:
+                    qubits_layer = list(set(qubits_layer) | set(gate))
+                qubits_layer = list(qubits_layer)
+                for qubit in qubits_layer:
+                    qubits_layer_notme = [q for q in qubits_layer]
+                    qubits_layer_notme.remove(qubit)
+                    assignment_layer = [assignment[q] for q in qubits_layer_notme]
+                    # If the circuit qubit is assigned to a physical qubit that is
+                    # already assigned to another circuit qubit, then 
+                    if assignment[qubit] in assignment_layer:
+                        # If the existing assignment within the layer uses up all
+                        # the physical qubits, then add another physical qubit and
+                        # assign qubit to this physical qubit.
+                        if set(assignment_layer) == {i+1 for i in range(physqubits_num)}:                       
+                            assignment[qubit] = physqubits_num + 1
+                            physqubits_num = physqubits_num + 1
+                        else:
+                            assignment[qubit] = min({i+1 for i in range(physqubits_num)} - set(assignment_layer))
+        return assignment
+
+    # Output a compressed circuit by assigning physical qubits to the circuit qubits.
+    ## Need to debug. There is no way this is not buggy.
+    def pcc_compressed(self, Supp):
+        circuit = self.pcc(Supp)
+        circuit_optimized = {}
+        # List all the involved circuit qubits.
+        qubits_circuit = []
+        for layer in circuit:
+            for gate in layer:
+                qubits_circuit = list(set(qubits_circuit) | set(gate))
+        qubits_circuit = list(qubits_circuit)
+        
+        # List all the layers.
+        layers = []
+        for layer in circuit:
+            layers = layers + [layer]
+        
+        # Initialize the assignment table.
+        assignment = {}
+        for qubit in qubits_circuit:
+            assignment[qubit] = 1
+
+        # Update the assignment table.
+        for layer in layers:
+            # List all the qubits in each layer.
+            qubits_layer = []
+            for gate in circuit[layer]:
+                qubits_layer = list(set(qubits_layer) | set(gate))
+            qubits_layer = list(qubits_layer)
+            # Go through the circuit qubits in the layer, and make sure that
+            # no assignment is redundant.
+            for qubit in qubits_layer:
+                # List all the assignments within the layer except for the qubit.
+                assignment_layer = [assignment[q] for q in qubits_layer.remove(qubit)]
+                # If the qubit assignment is redundant, then add 1.
+                if assignment[qubit] in assignment_layer:
+                    assignment[qubit] = max(assignment.values()) + 1
+
+        # Replace the circuit qubits by the physical qubits
+        with open('out.qasm', 'w') as script:
+            script.write('// This is Isaac Kim\'s pseudocode.\n')
+            for layer in layers[::-1]:
+                # Lookup table for which physical qubit was assigned to which circuit qubit.
+                assignment_prev = [-1] * max(assignment.values())
+                #
+                for gate in circuit[layer]:
+                    for qubit in gate:
+                        # If the assignment was used in the previous step, then reset.
+                        if qubit != assignment_prev[assignment[qubit]]:
+                            script.write('reset q'+str(assignment[qubit])+'\n')
+                            #circuit_optimized[layer] = circuit_optimized[layer] + [assignment[qubit]]
+                            # Replace the gate on the circuit qubit to the gate on the physical qubit.
+                    script.write('Apply' + str(self.gate(layer,gate)) + 'on' + str([assignment[qubit] for qubit in gate]) + '\n')
+                script.write('measure' + str(Supp) + '\n')
+        return 0
+                    
+                
+    
+            
 ## Return True if circuit1 and circuit 2 commute. Return False otherwise.
 def commute(circuit1, circuit2):
     if len(set(circuit1) & set(circuit2))==0:
