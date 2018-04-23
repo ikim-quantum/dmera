@@ -1,0 +1,5 @@
+# Author : Isaac Kim
+# A class that describes a gate
+
+class gate:
+    def __init__(self,qubits,)
