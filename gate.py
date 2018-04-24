@@ -4,11 +4,15 @@ import numpy as np
 
 
 class gate:
+    qubits = []
+    unitary = np.eye(0)
+
     def __init__(self, qubits=None, unitary=None):
         """
         Initialize the gate in terms of the qubits that it acts on
         and the unitary implemented on these qubits.
         """
+
         if qubits is None:
             # if qubits are not specified, create an empty gate
             self.qubits = []
@@ -44,3 +48,65 @@ class gate:
             else:
                 # if no error occurs, store the unitary
                 self.unitary = unitary
+
+
+class measure:
+    qubits = []
+
+    def __init__(self, qubits=None):
+        """
+        Specify qubits to measure. The measurement is done in the
+        computational basis.
+        """
+
+        if qubits is None:
+            # if qubits are not specified, create an empty list
+            self.qubits = []
+        elif not isinstance(qubits, list):
+            # if qubits are not specified as list, return a TypeError
+            print("TypeError : Qubits must be specified as a list.")
+            raise TypeError
+        else:
+            self.qubits = qubits
+
+
+class prepare:
+    qubits = []
+
+    def __init__(self, qubits=None):
+        """
+        Specify qubits to prepare. The preparation is done in the
+        computational basis.
+        """
+
+        if qubits is None:
+            # if qubits are not specified, create an empty list
+            self.qubits = []
+        elif not isinstance(qubits, list):
+            # if qubits are not specified as list, return a TypeError
+            print("TypeError : Qubits must be specified as a list.")
+            raise TypeError
+        else:
+            self.qubits = qubits
+
+
+def is_a_gate(new_gate):
+    if isinstance(new_gate, gate):
+        return True
+    elif isinstance(new_gate, measure):
+        return True
+    elif isinstance(new_gate, prepare):
+        return True
+    else:
+        return False
+
+
+def gate_type(new_gate):
+    if isinstance(new_gate, gate):
+        return "gate"
+    elif isinstance(new_gate, measure):
+        return "measure"
+    elif isinstance(new_gate, prepare):
+        return "prepare"
+    else:
+        return False
