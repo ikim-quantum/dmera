@@ -1,5 +1,19 @@
-# Author : Isaac Kim
-# A class that describes a gate
+# This is part of the DMERA project(https://github.com/ikim-quantum/dmera).
+# Copyright (C) 2018 Isaac H. Kim.
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import numpy as np
 
 
@@ -11,6 +25,10 @@ class gate:
         """
         Initialize the gate in terms of the qubits that it acts on
         and the unitary implemented on these qubits.
+
+        Args:
+            qubits: The set of qubits on which the gate is acted on.
+            unitary: The matrix that specifies the gate.
         """
 
         if qubits is None:
@@ -19,8 +37,7 @@ class gate:
             self.unitary = []
         elif not isinstance(qubits, list):
             # if qubits are not specified as list, return a TypeError
-            print("TypeError : Qubits must be specified as a list.")
-            raise TypeError
+            raise TypeError("Qubits must be specified as a list.")
         else:
             # if qubits are specified in terms of a list, store it
             self.qubits = qubits
@@ -29,25 +46,34 @@ class gate:
                 self.unitary = np.eye(len(qubits) ** 2)
             elif not isinstance(unitary, np.ndarray):
                 # if unitary is notndarray, return a TypeError
-                print("TypeError : Unitary must be a numpy ndarray")
-                raise TypeError
+                raise TypeError("Unitary must be a numpy ndarray.")
             elif unitary.ndim != 2:
                 # if unitary is not a matrix, return a TypeError
-                print("TypeError : Unitary must be a matrix.")
-                raise TypeError
+                raise TypeError("Unitary must be a matrix.")
             elif unitary.shape[0] != unitary.shape[1]:
                 # if unitary is not a square matrix, return a TypeError
-                print("TypeError : Unitary must be a square matrix.")
-                raise TypeError
+                raise TypeError("Unitary must be a square matrix.")
             elif unitary.shape[0] != len(qubits) ** 2:
                 # if the unitary dimension is incorrect, return ValueError
-                print("ValueError : Dimension must match the qubit list.")
-                print("This gate uses {} qubits but the dimension of the"
-                      " unitary is {}".format(len(qubits), unitary.shape[0]))
-                raise ValueError
+                raise ValueError("Dimension must match the qubit list.")
             else:
                 # if no error occurs, store the unitary
                 self.unitary = unitary
+
+    def has_qubits(self, qubits):
+        """
+        Checks if the gate acts on qubits.
+
+        Args:
+            qubits: Qubits of interest
+
+        Rerturns:
+            bool: True if the gate acts on some qubits, False otherwise.
+        """
+        if not set(qubits).isdisjoint(self.qubits):
+            return True
+        else:
+            return False
 
 
 class measure:
@@ -57,6 +83,9 @@ class measure:
         """
         Specify qubits to measure. The measurement is done in the
         computational basis.
+
+        Args:
+            qubits: Qubits of interest
         """
 
         if qubits is None:
@@ -68,6 +97,21 @@ class measure:
             raise TypeError
         else:
             self.qubits = qubits
+
+    def has_qubits(self, qubits):
+        """
+        Checks if the measurement is applied to the qubits.
+
+        Args:
+            qubits: Qubits of interest
+
+        Returns:
+            bool: True if at least one qubit is measured, False otherwise.
+        """
+        if not set(qubits).isdisjoint(self.qubits):
+            return True
+        else:
+            return False
 
 
 class prepare:
@@ -77,6 +121,9 @@ class prepare:
         """
         Specify qubits to prepare. The preparation is done in the
         computational basis.
+
+        Args:
+            qubits: Qubits of interest
         """
 
         if qubits is None:
@@ -84,29 +131,41 @@ class prepare:
             self.qubits = []
         elif not isinstance(qubits, list):
             # if qubits are not specified as list, return a TypeError
-            print("TypeError : Qubits must be specified as a list.")
-            raise TypeError
+            raise TypeError("Qubits must be specified as a list.")
         else:
             self.qubits = qubits
 
+    def has_qubits(self, qubits):
+        """
+        Checks if qubits were prepared.
+
+        Args:
+            qubits: Qubits of interest
+
+        Returns:
+            True if at least one of the qubits were prepared, False otherwise.
+        """
+        if not set(qubits).isdisjoint(self.qubits):
+            return True
+        else:
+            return False
+
 
 def is_a_gate(new_gate):
+    """
+    Checks if new_gate is a proper gate.
+
+    Args:
+        new_gate: Gate of interest
+
+    Returns:
+        True if the input is a proper gate, False otherwise.
+    """
     if isinstance(new_gate, gate):
         return True
     elif isinstance(new_gate, measure):
         return True
     elif isinstance(new_gate, prepare):
         return True
-    else:
-        return False
-
-
-def gate_type(new_gate):
-    if isinstance(new_gate, gate):
-        return "gate"
-    elif isinstance(new_gate, measure):
-        return "measure"
-    elif isinstance(new_gate, prepare):
-        return "prepare"
     else:
         return False
