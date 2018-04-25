@@ -35,19 +35,28 @@ class circuit(list):
 
     def append(self, new_gate):
         """
-        Appends new_gate.
+        Appends new_gate. For measure/prepare, qubit list is broken down
+        to operations on individual qubits.
 
         Args:
             new_gate (gate): Append new_gate to the circuit.
         """
         if gt.is_a_gate(new_gate):
-            super().append(new_gate)
+            if isinstance(new_gate, gt.gate):
+                super().append(new_gate)
+            elif isinstance(new_gate, gt.prepare):
+                for qubit in new_gate.qubits:
+                    super().append(gt.prepare([qubit]))
+            elif isinstance(new_gate, gt.measure):
+                for qubit in new_gate.qubits:
+                    super().append(gt.measure([qubit]))
         else:
             raise TypeError("Input is not a proper gate.")
 
     def extend(self, other_circuit):
         """
-        Extend the existing circuit by other_circuit.
+        Extend the existing circuit by other_circuit. For measure/prepare,
+        qubit list is broken down to operations on individual qubits.
 
         Args:
             other_circuit (circuit): Extend other_circuit to the circuit.
@@ -56,7 +65,8 @@ class circuit(list):
             if not gt.is_a_gate(gate):
                 raise TypeError("Input must be a circuit.")
         else:
-            super().extend(other_circuit)
+            for gate in other_circuit:
+                self.append(gate)
 
     def index(self, gate_or_qubit):
         """
