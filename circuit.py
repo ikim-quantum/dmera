@@ -58,7 +58,7 @@ class circuit(list):
         Returns:
             circuit: Returns the circuit exponent times.
         """
-        out_circuit = circuit() 
+        out_circuit = circuit()
         for n in range(exponent):
             out_circuit.extend(self)
         self = out_circuit

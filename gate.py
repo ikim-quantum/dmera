@@ -71,6 +71,13 @@ class gate:
 
         return qubit_list + my_gate
 
+    def __contains__(self, my_qubit):
+        """
+        Returns:
+            bool: True if my_qubit in self.qubits, False otherwise.
+        """
+        return my_qubit in self.qubits
+
     def has_qubits(self, qubits):
         """
         Checks if the gate acts on qubits.
@@ -130,6 +137,13 @@ class measure:
                                              in self.qubits])
         return qubit_list
 
+    def __contains__(self, my_qubit):
+        """
+        Returns:
+            bool: True if my_qubit in self.qubits, False otherwise.
+        """
+        return my_qubit in self.qubits
+
     def has_qubits(self, qubits):
         """
         Checks if the measurement is applied to the qubits.
@@ -187,6 +201,13 @@ class prepare:
         qubit_list = "Prepare " + ", ".join([str(my_qubit) for my_qubit
                                              in self.qubits])
         return qubit_list
+
+    def __contains__(self, my_qubit):
+        """
+        Returns:
+            bool: True if my_qubit in self.qubits, False otherwise.
+        """
+        return my_qubit in self.qubits
 
     def has_qubits(self, qubits):
         """
