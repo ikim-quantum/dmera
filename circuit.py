@@ -33,6 +33,21 @@ class circuit(list):
         """
         self.extend(input_circuit)
 
+    def __pow__(self, exponent):
+        """
+        Returns the squared circuit.
+
+        Args:
+            exponent (int): Repeat the circuit this many times.
+
+        Returns:
+            circuit: Returns the squared circuit.
+        """
+        out_circuit = circuit()
+        for n in range(exponent):
+            out_circuit.extend(self)
+        return out_circuit
+
     def append(self, new_gate):
         """
         Appends new_gate. For measure/prepare, qubit list is broken down
