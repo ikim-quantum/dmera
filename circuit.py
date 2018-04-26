@@ -121,6 +121,7 @@ class Circuit(list):
             raise ValueError(
                 "Qubit {} not in the circuit".format(gate_or_qubit))
 
+    @property
     def is_parallel(self):
         """
         Checks if the circuit can be run in parallel.
@@ -159,6 +160,7 @@ class Circuit(list):
         except ValueError:
             return False
 
+    @property
     def all_prepared(self):
         """
         Check if every qubit in the circuit is prepared properly.
@@ -188,6 +190,7 @@ class Circuit(list):
                     my_gates.append(gate)
         return my_gates
 
+    @property
     def qubits(self):
         """
         Returns a list of qubits that appeared in the circuit.
