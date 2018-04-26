@@ -31,3 +31,11 @@ class qubit:
         """
         self.label_circuit = label_circuit
         self.label_physical = label_physical
+
+    def __str__(self):
+        """
+        Returns:
+            str: Returns a string with circuit and physical qubit.
+        """
+        return "[Circuit={}, Physical={}]".format(self.label_circuit,
+                                                  self.label_physical)

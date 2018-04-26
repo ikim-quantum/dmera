@@ -60,6 +60,17 @@ class gate:
                 # if no error occurs, store the unitary
                 self.unitary = unitary
 
+    def __str__(self):
+        """
+        Returns:
+            str: Returns a string with qubits and gates
+        """
+        qubit_list = "Acting on " + ", ".join([str(my_qubit) for my_qubit
+                                               in self.qubits]) + "\n"
+        my_gate = str(self.unitary)
+
+        return qubit_list + my_gate
+
     def has_qubits(self, qubits):
         """
         Checks if the gate acts on qubits.
@@ -110,6 +121,15 @@ class measure:
         else:
             self.qubits = qubits
 
+    def __str__(self):
+        """
+        Returns:
+            str: Returns a string with qubits.
+        """
+        qubit_list = "Measure " + ", ".join([str(my_qubit) for my_qubit
+                                             in self.qubits])
+        return qubit_list
+
     def has_qubits(self, qubits):
         """
         Checks if the measurement is applied to the qubits.
@@ -158,6 +178,15 @@ class prepare:
             raise TypeError("Qubits must be specified as a list.")
         else:
             self.qubits = qubits
+
+    def __str__(self):
+        """
+        Returns:
+            str: Returns a string with qubits
+        """
+        qubit_list = "Prepare " + ", ".join([str(my_qubit) for my_qubit
+                                             in self.qubits])
+        return qubit_list
 
     def has_qubits(self, qubits):
         """
