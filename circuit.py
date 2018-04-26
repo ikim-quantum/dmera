@@ -35,17 +35,33 @@ class circuit(list):
 
     def __pow__(self, exponent):
         """
-        Returns the squared circuit.
+        Returns the circuit applied multiple times.
 
         Args:
             exponent (int): Repeat the circuit this many times.
 
         Returns:
-            circuit: Returns the squared circuit.
+            circuit: Returns the circuit applied exponent times.
         """
         out_circuit = circuit()
         for n in range(exponent):
             out_circuit.extend(self)
+        return out_circuit
+
+    def __ipow__(self, exponent):
+        """
+        Update the circuit to the same circuit applied multiple times.
+
+        Args:
+            exponent (int): Repeat the circuit this many times.
+
+        Returns:
+            circuit: Returns the circuit exponent times.
+        """
+        out_circuit = circuit() 
+        for n in range(exponent):
+            out_circuit.extend(self)
+        self = out_circuit
         return out_circuit
 
     def append(self, new_gate):
