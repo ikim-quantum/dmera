@@ -75,6 +75,18 @@ class gate:
         else:
             return False
 
+    def qubit_labels(self):
+        """
+        Returns a list of qubit labels in the circuit.
+
+        Returns:
+            First list: The list of qubit labels in the circuit
+            Second list: The list of qubit labels in the physical device.
+        """
+        labels_circuit = [my_qubit.label_circuit for my_qubit in self.qubits]
+        labels_physical = [my_qubit.label_physical for my_qubit in self.qubits]
+        return labels_circuit, labels_physical
+
 
 class measure:
     qubits = []
@@ -113,6 +125,18 @@ class measure:
         else:
             return False
 
+    def qubit_labels(self):
+        """
+        Returns a list of qubit labels in the circuit.
+
+        Returns:
+            First list: The list of qubit labels in the circuit
+            Second list: The list of qubit labels in the physical device.
+        """
+        labels_circuit = [my_qubit.label_circuit for my_qubit in self.qubits]
+        labels_physical = [my_qubit.label_physical for my_qubit in self.qubits]
+        return labels_circuit, labels_physical
+
 
 class prepare:
     qubits = []
@@ -149,6 +173,18 @@ class prepare:
             return True
         else:
             return False
+
+    def qubit_labels(self):
+        """
+        Returns a list of qubit labels in the circuit.
+
+        Returns:
+            First list: The list of qubit labels in the circuit
+            Second list: The list of qubit labels in the physical device.
+        """
+        labels_circuit = [my_qubit.label_circuit for my_qubit in self.qubits]
+        labels_physical = [my_qubit.label_physical for my_qubit in self.qubits]
+        return labels_circuit, labels_physical
 
 
 def is_a_gate(new_gate):
