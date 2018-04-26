@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-class qubit:
+class Qubit:
     """
     Qubit class. Even though this class contains no method, this class
     will become handy in recursively generating DMERA ansatz at different

@@ -17,7 +17,7 @@
 import gate as gt
 
 
-class circuit(list):
+class Circuit(list):
     """
     The circuit class is inherited from Python's original list class.
     Circuit class overrides the list methods in a way that forces the
@@ -73,14 +73,14 @@ class circuit(list):
             new_gate (gate): Append new_gate to the circuit.
         """
         if gt.is_a_gate(new_gate):
-            if isinstance(new_gate, gt.gate):
+            if isinstance(new_gate, gt.Gate):
                 super().append(new_gate)
-            elif isinstance(new_gate, gt.prepare):
+            elif isinstance(new_gate, gt.Prepare):
                 for qubit in new_gate.qubits:
-                    super().append(gt.prepare([qubit]))
-            elif isinstance(new_gate, gt.measure):
+                    super().append(gt.Prepare([qubit]))
+            elif isinstance(new_gate, gt.Measure):
                 for qubit in new_gate.qubits:
-                    super().append(gt.measure([qubit]))
+                    super().append(gt.Measure([qubit]))
         else:
             raise TypeError("Input is not a proper gate.")
 
@@ -152,7 +152,7 @@ class circuit(list):
             bool: True if the qubit is prepared properly, False otherwise.
         """
         try:
-            if isinstance(self[self.index(qubit)], gt.prepare):
+            if isinstance(self[self.index(qubit)], gt.Prepare):
                 return True
             else:
                 return False

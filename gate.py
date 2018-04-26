@@ -17,7 +17,7 @@
 import numpy as np
 
 
-class gate:
+class Gate:
     qubits = []
     unitary = np.eye(0)
 
@@ -106,7 +106,7 @@ class gate:
         return labels_circuit, labels_physical
 
 
-class measure:
+class Measure:
     qubits = []
 
     def __init__(self, qubits=None):
@@ -172,7 +172,7 @@ class measure:
         return labels_circuit, labels_physical
 
 
-class prepare:
+class Prepare:
     qubits = []
 
     def __init__(self, qubits=None):
@@ -247,11 +247,11 @@ def is_a_gate(new_gate):
     Returns:
         True if the input is a proper gate, False otherwise.
     """
-    if isinstance(new_gate, gate):
+    if isinstance(new_gate, Gate):
         return True
-    elif isinstance(new_gate, measure):
+    elif isinstance(new_gate, Measure):
         return True
-    elif isinstance(new_gate, prepare):
+    elif isinstance(new_gate, Prepare):
         return True
     else:
         return False
