@@ -15,13 +15,14 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from circuit import circuit
-import gate as gt
 
-class dmera1(circuit):
+
+class DMERA1(circuit):
     """
-    This is a DMERA circuit ansatz for quantum many-body systems in 
-    one spatial dimension. 
+    This is a DMERA circuit ansatz for quantum many-body systems in
+    one spatial dimension.
     """
+
     def __init__(self, scales=0, depth=0):
         """
         Initializes the instance with a DMERA with identity gates.
@@ -35,10 +36,9 @@ class dmera1(circuit):
 
     def fine_grain(self, unit_coarse, unit_fine):
         """
-        Fine-grain DMERA 
-        
+        Fine-grain DMERA
+
         Args:
             unit_coarse (int): unit interval(coarse scale)
             unit_fine (int): unit interval(finer scale)
         """
-        
