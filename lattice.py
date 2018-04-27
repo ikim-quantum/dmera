@@ -18,76 +18,83 @@ import numpy as np
 from qubit import Qubit
 
 
-class Coordinate(tuple):
-    def __init__(self, *args):
-        self = (*args)
+class Point(tuple):
+    """
+    Points on a square lattice
+    """
+    def __init__(self, v):
+        self = tuple(v)
+        return self
 
     def __mul__(self, other):
         if isinstance(other, int):
-            return ([n * other for n in self])
+            return Point([n * other for n in self])
         elif isinstance(other, tuple):
-            return ([n * factor for n, factor in zip(self, other)])
+            return Point([n * factor for n, factor in zip(self, other)])
 
     def __imul__(self, other):
-        if isinstance(other, int):
-            self = self * other
-        elif isinstance(other, tuple):
-            self = self * other
+        self = self * other
+        return self
 
     def __add__(self, other):
-        return ([i + j for i, j in zip(self, other)])
+        return Point([i + j for i, j in zip(self, other)])
 
     def __iadd__(self, other):
         self = self + other
+        return self
 
     def __sub__(self, other):
-        return ([i - j for i, j in zip(self, other)])
+        return Point([i - j for i, j in zip(self, other)])
 
     def __isub__(self, other):
         self = self - other
+        return self
 
 
 class Lattice():
-
-    qubits = []
-    d = 0
-    size = 0
-
     def __init__(self, size=1):
         """
         Generates a lattice of size l_1 x l_2 x ... for size = (l_1, l_2,
         ...). Each lattice site contains a qubit.
 
         Args:
-            size(tuple of int): length of the lattice in each directions
+            size(list of int): length of the lattice in each directions
         """
-        self.coordinates = [Coordinate(loc) for loc in np.ndindex(size)]
-        self.qubits = {v: Qubit(v) for v in self.coordinates}
+        self.pts = [Point(loc) for loc in np.ndindex(tuple(size))]
+        self.qubits = {v: Qubit(v) for v in self.pts}
         self.d = dim_spatial(size)
-        self.size = size
+        self.size = Point(size)
 
     def fine_grain(self, blowup_factor):
         """
         Fine-grain the existing lattice into a larger lattice
         """
-        new_size = self.size * blowup_factor
-        old_qubits = {
-            v * blowup_factor: self.qubits[v] for v in self.coordinates}
-        pts = [Coordinate(loc) for loc in np.ndindex(new_size)]
-        pts_old = [v * blowup_factor for v in self.coordinates]
-        pts_new = [loc for loc in pts if loc not in pts_old]
+        if isinstance(blowup_factor, int):
+            factor = tuple([blowup_factor for i in range(self.d)])
+        else:
+            factor = tuple(blowup_factor)
+        self.size *= factor
+        # set of new points
+        pts = [Point(loc) for loc in np.ndindex(self.size)]
+        pts_inherited = [v * factor for v in self.pts]
+        pts_new = [loc for loc in pts if loc not in pts_inherited]
 
-        for v in pts_old:
-            old_qubits[v].label_circuit = v
-
+        # embed the old qubits to a new lattice
+        self.qubits = {v * factor: self.qubits[v] for v in self.pts}
+        # change the label_circuit for the old qubits
+        for v in pts_inherited:
+            self.qubits[v].label_circuit = v
+        # introduce the new qubits
         for v in pts_new:
-            old_qubits[v] = Qubit(v)
+            self.qubits[v] = Qubit(v)
+        # update the set of points
+        self.pts = pts
 
 
 def dim_spatial(size):
     if isinstance(size, int):
         return 1
-    elif isinstance(size, tuple):
+    elif isinstance(size, list):
         for n in size:
             if not isinstance(n, int):
                 raise TypeError("The size should be specified as integers.")
@@ -95,4 +102,4 @@ def dim_spatial(size):
                 return ValueError("Integer is not positive.")
         return len(size)
     else:
-        raise TypeError("Input should be an integer or a tuple of integers.")
+        raise TypeError("Input should be an integer or a list of integers.")
