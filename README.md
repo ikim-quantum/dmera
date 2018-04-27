@@ -1,6 +1,16 @@
 # What is DMERA?
 
-DMERA is an acronym for deep multi-scale entanglement renormalization ansatz. 
+DMERA is an acronym for deep multi-scale entanglement renormalization ansatz. This ansatz was proposed in [this preprint](https://arxiv.org/abs/1711.07500). DMERA is a tensor network that was specifically designed to be contracted on a quantum computer. One can certainly simulate this contraction on a classical computer, the cost will be huge. The cost scales exponentially with the number of variational parameters on a classical computer, but only linearly on a classical computer.
+
+# Why DMERA?
+
+If you want to do something meaningful in the [noisy intermediate scale quantum era](https://arxiv.org/abs/1801.00862), DMERA will be one compelling tool. Why?
+
+1) DMERA solves a problem of practical interest. Simulation of strongly interacting quantum many-body systems is one of the outstanding problems in physics. On many [theoretical grounds](https://arxiv.org/abs/1711.07500), we expect the ansatz to be an accurate approximation of the ground state of such systems.
+
+2) DMERA is deep. Unlike most near-term quantum algorithms, the depth of DMERA scales with the system size. This gives a larger expressability then circuits that are equipped with smaller depth.
+
+3) DMERA is noise-resilient. Even though DMERA is deep, the circuit is resilient to noise, even without performing error correction! This means that for DMERA calculation, one can circumvent the high overhead cost associated to quantum error correction.
 
 # Immediate Goals
 ## Higher-dimensional generalizations
