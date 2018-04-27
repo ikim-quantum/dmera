@@ -1,4 +1,4 @@
-[[https://github.com/ikim-quantum/dmera/blob/master/dmera.png]]
+![Alt Text](https://raw.githubusercontent.com/ikim-quantum/dmera/master/dmera.png)
 # What is DMERA?
 
 DMERA is an acronym for deep multi-scale entanglement renormalization ansatz. This ansatz was proposed in [this preprint](https://arxiv.org/abs/1711.07500). DMERA is a tensor network that was specifically designed to be contracted on a quantum computer. One can certainly simulate this contraction on a classical computer, the cost will be huge. The cost scales exponentially with the number of variational parameters on a classical computer, but only linearly on a classical computer.
