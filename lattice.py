@@ -22,9 +22,8 @@ class Point(tuple):
     """
     Points on a square lattice
     """
-    def __init__(self, v):
+    def __init__(self, *v):
         self = tuple(v)
-        return self
 
     def __mul__(self, other):
         if isinstance(other, int):
@@ -35,6 +34,12 @@ class Point(tuple):
     def __imul__(self, other):
         self = self * other
         return self
+
+    def __mod__(self, other):
+        for n in range(len(self)):
+            if self[n] % other[n]:
+                return False
+        return True
 
     def __add__(self, other):
         return Point([i + j for i, j in zip(self, other)])
@@ -52,7 +57,7 @@ class Point(tuple):
 
 
 class Lattice():
-    def __init__(self, size=1):
+    def __init__(self, *args):
         """
         Generates a lattice of size l_1 x l_2 x ... for size = (l_1, l_2,
         ...). Each lattice site contains a qubit.
@@ -60,12 +65,18 @@ class Lattice():
         Args:
             size(list of int): length of the lattice in each directions
         """
-        self.pts = [Point(loc) for loc in np.ndindex(tuple(size))]
+        self.d = dim_spatial(args)
+        self.size = Point(args)
+        self.pts = [Point(loc) for loc in self]
         self.qubits = {v: Qubit(v) for v in self.pts}
-        self.d = dim_spatial(size)
-        self.size = Point(size)
 
-    def fine_grain(self, blowup_factor):
+    def __iter__(self):
+        return np.ndindex(self.size)
+
+    def sublattice(self, *v):
+        return [pt for pt in self.pts if pt % v]
+
+    def fine_grain(self, *blowup_factor):
         """
         Fine-grain the existing lattice into a larger lattice
         """
@@ -75,7 +86,7 @@ class Lattice():
             factor = tuple(blowup_factor)
         self.size *= factor
         # set of new points
-        pts = [Point(loc) for loc in np.ndindex(self.size)]
+        pts = [Point(loc) for loc in self]
         pts_inherited = [v * factor for v in self.pts]
         pts_new = [loc for loc in pts if loc not in pts_inherited]
 
@@ -94,7 +105,7 @@ class Lattice():
 def dim_spatial(size):
     if isinstance(size, int):
         return 1
-    elif isinstance(size, list):
+    elif isinstance(size, tuple):
         for n in size:
             if not isinstance(n, int):
                 raise TypeError("The size should be specified as integers.")
@@ -102,4 +113,4 @@ def dim_spatial(size):
                 return ValueError("Integer is not positive.")
         return len(size)
     else:
-        raise TypeError("Input should be an integer or a list of integers.")
+        raise TypeError("Input should be an integer or a tuple of integers.")

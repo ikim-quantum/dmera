@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import gate as gt
-
+from lattice import Lattice
 
 class Circuit(list):
     """
@@ -33,6 +33,15 @@ class Circuit(list):
         """
         self.extend(input_circuit)
 
+#    @classmethod
+#    def slice(cls, *args):
+#        """
+#        Creates an instance of a single-slice circuit. 
+#
+#        Args:
+#            *args (int): Tuple of integers that specify the size
+#        """
+        
     def __pow__(self, exponent):
         """
         Returns the circuit applied multiple times.

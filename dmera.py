@@ -15,6 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from circuit import circuit
+from lattice import Lattice
 
 
 class DMERA1(circuit):
@@ -42,3 +43,14 @@ class DMERA1(circuit):
             unit_coarse (int): unit interval(coarse scale)
             unit_fine (int): unit interval(finer scale)
         """
+
+
+class Slice(circuit):
+    """
+    Single-depth quantum circuit. Translationally invariant. Specified by
+    a single two-qubit gate.
+    """
+
+    def __init__(self, my_lattice):
+        if not isinstance(my_lattice, Lattice):
+            raise TypeError("Input for LDQC __init__ must be a Lattice.")
