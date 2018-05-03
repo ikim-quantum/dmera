@@ -16,6 +16,7 @@
 
 import gate as gt
 from lattice import Lattice
+from lattice import Point
 
 class Circuit(list):
     """
@@ -33,14 +34,32 @@ class Circuit(list):
         """
         self.extend(input_circuit)
 
-#    @classmethod
-#    def slice(cls, *args):
-#        """
-#        Creates an instance of a single-slice circuit. 
-#
-#        Args:
-#            *args (int): Tuple of integers that specify the size
-#        """
+    @classmethod
+    def slice(cls, *args):
+        """
+        Creates an instance of a single-slice circuit. 
+
+        Args:
+            *args (int): Tuple of integers that specify the size
+        Returns:
+            Circuit : Returns a circuit that implements nearest-neighbor
+                      each directions. If the input size is d-dimensional,
+                      then the depth of the circuit is d. 
+        Warning : For now, the size ought to be even. Otherwise, depth becomes
+                  2d. This needs to be fixed.
+        """
+        my_lattice = Lattice(*args)
+        dim = len(args)
+        my_circuit = cls()
+        for n in range(dim):
+            vec = tuple([int(n == i) + 1 for i in range(dim)])
+            vec2 = tuple([int(n == i) for i in range(dim)])
+            sublattice = my_lattice.sublattice(*vec)
+            print(vec)
+            layer = [gt.Gate([Point(pt), Point(pt)+vec2]) for pt in
+                     sublattice]
+            my_circuit.extend(layer)
+        return my_circuit
         
     def __pow__(self, exponent):
         """
