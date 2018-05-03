@@ -18,6 +18,7 @@ import gate as gt
 from lattice import Lattice
 from lattice import Point
 
+
 class Circuit(list):
     """
     The circuit class is inherited from Python's original list class.
@@ -37,14 +38,14 @@ class Circuit(list):
     @classmethod
     def slice(cls, *args):
         """
-        Creates an instance of a single-slice circuit. 
+        Creates an instance of a single-slice circuit.
 
         Args:
             *args (int): Tuple of integers that specify the size
         Returns:
             Circuit : Returns a circuit that implements nearest-neighbor
                       each directions. If the input size is d-dimensional,
-                      then the depth of the circuit is d. 
+                      then the depth of the circuit is d.
         Warning : For now, the size ought to be even. Otherwise, depth becomes
                   2d. This needs to be fixed.
         """
@@ -56,11 +57,11 @@ class Circuit(list):
             vec2 = tuple([int(n == i) for i in range(dim)])
             sublattice = my_lattice.sublattice(*vec)
             print(vec)
-            layer = [gt.Gate([Point(pt), Point(pt)+vec2]) for pt in
+            layer = [gt.Gate([Point(pt), Point(pt) + vec2]) for pt in
                      sublattice]
             my_circuit.extend(layer)
         return my_circuit
-        
+
     def __pow__(self, exponent):
         """
         Returns the circuit applied multiple times.
@@ -71,7 +72,7 @@ class Circuit(list):
         Returns:
             circuit: Returns the circuit applied exponent times.
         """
-        out_circuit = circuit()
+        out_circuit = Circuit()
         for n in range(exponent):
             out_circuit.extend(self)
         return out_circuit
@@ -86,7 +87,7 @@ class Circuit(list):
         Returns:
             circuit: Returns the circuit exponent times.
         """
-        out_circuit = circuit()
+        out_circuit = Circuit()
         for n in range(exponent):
             out_circuit.extend(self)
         self = out_circuit
@@ -264,7 +265,7 @@ class Circuit(list):
             circuit: Past causal cone of qubits.
         """
         tracked_qubits = qubits
-        my_pcc = circuit()
+        my_pcc = Circuit()
         for gate in reversed(self):
             if gate.has_qubits(qubits):
                 tracked_qubits += gate.qubits
