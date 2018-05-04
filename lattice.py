@@ -15,6 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy as np
+import matplotlib.pyplot as plt
 from qubit import Qubit
 
 
@@ -73,6 +74,32 @@ class Lattice():
     def __iter__(self):
         return np.ndindex(self.size)
 
+    def draw(self, *v_sublattice):
+        """
+        Draws lattice. Only works for 2D lattice.
+        """
+
+        try:
+            if self.d == 1:
+                for site in self.sublattice(*v_sublattice):
+                    nbhr = site + v_sublattice - [1]
+                    plt.plot([site, nbhr], [0, 0], color='k')
+                    plt.plot(site, 0, "o", color='blue')
+                    plt.plot(nbhr, 0, "o", color='red')
+
+            else:
+                for site in self.sublattice(*v_sublattice):
+                    nbhr = (site + v_sublattice) + (-1, -1)
+                    plt.plot([site[0], nbhr[0]], [site[1], nbhr[1]], color='k')
+                    plt.plot(site[0], site[1], "o", color='blue')
+                    plt.plot(nbhr[0], nbhr[1], "o", color='red')
+                
+        except ValueError:
+            print("Only 2D is supported.")
+
+        plt.axis('off')
+        plt.show()
+        
     def sublattice(self, *v):
         return [pt for pt in self.pts if pt % v]
 
