@@ -66,7 +66,6 @@ class Lattice():
         Args:
             size(list of int): length of the lattice in each directions
         """
-        self.d = dim_spatial(args)
         self.size = Point(args)
         self.pts = [Point(loc) for loc in self]
         self.qubits = {v: Qubit(v) for v in self.pts}
@@ -74,6 +73,10 @@ class Lattice():
     def __iter__(self):
         return np.ndindex(self.size)
 
+    @property
+    def d(self):
+        return dim_spatial(self.size)
+    
     def draw(self, *v_sublattice):
         """
         Draws lattice. Only works for 2D lattice.
