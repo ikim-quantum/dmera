@@ -15,6 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy as np
+from qubit import Qubit
 
 
 class Gate:
@@ -39,6 +40,9 @@ class Gate:
             # if qubits are not specified as list, return a TypeError
             raise TypeError("Qubits must be specified as a list.")
         else:
+            for qubit in qubits:
+                if not isinstance(qubit, Qubit):
+                    raise TypeError("Gates can only act on Qubits.")
             # if qubits are specified in terms of a list, store it
             self.qubits = qubits
             if unitary is None:

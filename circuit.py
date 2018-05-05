@@ -36,31 +36,63 @@ class Circuit(list):
         self.extend(input_circuit)
 
     @classmethod
-    def slice(cls, *args):
+    def singles(cls, qubits, unitary):
         """
-        Creates an instance of a single-slice circuit.
+        Creates an instance of a single-slice circuit that applies unitary
+        to the qubits
 
         Args:
-            *args (int): Tuple of integers that specify the size
+            qubits (list): list of qubits
+            unitary (nparray): unitary
         Returns:
-            Circuit : Returns a circuit that implements nearest-neighbor
-                      each directions. If the input size is d-dimensional,
-                      then the depth of the circuit is d.
-        Warning : For now, the size ought to be even. Otherwise, depth becomes
-                  2d. This needs to be fixed.
+            (Circuit): Returns a circuit that implements a set of gates on
+                the qubits with the input unitary.
         """
-        my_lattice = Lattice(*args)
-        dim = len(args)
-        my_circuit = cls()
-        for n in range(dim):
-            vec = tuple([int(n == i) + 1 for i in range(dim)])
-            vec2 = tuple([int(n == i) for i in range(dim)])
-            sublattice = my_lattice.sublattice(*vec)
-            print(vec)
-            layer = [gt.Gate([Point(pt), Point(pt) + vec2]) for pt in
-                     sublattice]
-            my_circuit.extend(layer)
-        return my_circuit
+        return Circuit([gt.Gate(qubit, unitary) for qubit in qubits])
+
+    @classmethod
+    def doubles(cls, qubits_c, qubits_t, unitary):
+        """
+        Creates an instance of a circuit that applies unitary to the two
+        qubits.
+
+        Args:
+            qubits_c (list): list of control qubits
+            qubits_t (list): list of target qubits
+            unitary (nparray): unitary
+        Returns:
+            (Circuit): Returns a circuit that implements a set of gates with
+                the unitary from the control to the target qubit.
+        """
+        return Circuit([gt.Gate([qubit_c, qubit_t], unitary) for
+                        qubit_c, qubit_t in zip(qubits_c, qubits_t)])
+        
+#    @classmethod
+#    def slice(cls, *args):
+#        """
+#        Creates an instance of a single-slice circuit.
+#
+#        Args:
+#            *args (int): Tuple of integers that specify the size
+#        Returns:
+#            Circuit : Returns a circuit that implements nearest-neighbor
+#                      each directions. If the input size is d-dimensional,
+#                      then the depth of the circuit is d.
+#        Warning : For now, the size ought to be even. Otherwise, depth becomes
+#                  2d. This needs to be fixed.
+#        """
+#        my_lattice = Lattice(*args)
+#        dim = len(args)
+#        my_circuit = cls()
+#        for n in range(dim):
+#            vec = tuple([int(n == i) + 1 for i in range(dim)])
+#            vec2 = tuple([int(n == i) for i in range(dim)])
+#            sublattice = my_lattice.sublattice(*vec)
+#            print(vec)
+#            layer = [gt.Gate([Point(pt), Point(pt) + vec2]) for pt in
+#                     sublattice]
+#            my_circuit.extend(layer)
+#        return my_circuit
 
     def __pow__(self, exponent):
         """
