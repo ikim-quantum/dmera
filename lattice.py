@@ -23,6 +23,7 @@ class Point(tuple):
     """
     Points on a square lattice
     """
+
     def __init__(self, *v):
         self = tuple(v)
 
@@ -66,17 +67,24 @@ class Lattice():
         Args:
             size(list of int): length of the lattice in each directions
         """
-        self.size = Point(args)
-        self.pts = [Point(loc) for loc in self]
-        self.qubits = {v: Qubit(v) for v in self.pts}
+        self.pts = [Point(loc) for loc in np.ndindex(args)]
 
     def __iter__(self):
         return np.ndindex(self.size)
 
     @property
+    def size(self):
+        return Point([max([pt[i] for pt in self.pts]) + 1 for
+                      i in range(self.d)])
+
+    @property
+    def qubits(self):
+        return {v: Qubit(v) for v in self.pts}
+
+    @property
     def d(self):
-        return dim_spatial(self.size)
-    
+        return dim_spatial(self.pts[0])
+
     def draw(self, *v_sublattice):
         """
         Draws lattice. Only works for 2D lattice.
@@ -96,13 +104,13 @@ class Lattice():
                     plt.plot([site[0], nbhr[0]], [site[1], nbhr[1]], color='k')
                     plt.plot(site[0], site[1], "o", color='blue')
                     plt.plot(nbhr[0], nbhr[1], "o", color='red')
-                
+
         except ValueError:
             print("Only 2D is supported.")
 
         plt.axis('off')
         plt.show()
-        
+
     def sublattice(self, *v):
         return [pt for pt in self.pts if pt % v]
 
@@ -139,8 +147,8 @@ def dim_spatial(size):
         for n in size:
             if not isinstance(n, int):
                 raise TypeError("The size should be specified as integers.")
-            elif n < 1:
-                return ValueError("Integer is not positive.")
+            elif n < 0:
+                return ValueError("Integer is negative.")
         return len(size)
     else:
         raise TypeError("Input should be an integer or a tuple of integers.")
