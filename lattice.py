@@ -26,7 +26,7 @@ class Point(tuple):
 
     def __init__(self, *v):
         self = tuple(v)
-
+    
     def __mul__(self, other):
         if isinstance(other, int):
             return Point([n * other for n in self])
@@ -38,10 +38,11 @@ class Point(tuple):
         return self
 
     def __mod__(self, other):
-        for n in range(len(self)):
-            if self[n] % other[n]:
-                return False
-        return True
+        return Point([i % j for i, j in zip(self, other)])
+
+    def __imod__(self, other):
+        self = self % other
+        return self
 
     def __add__(self, other):
         return Point([i + j for i, j in zip(self, other)])
@@ -68,21 +69,35 @@ class Lattice():
             size(list of int): length of the lattice in each directions
         """
         self.pts = [Point(loc) for loc in np.ndindex(args)]
+        self.qubits = {v: Qubit(v) for v in self.pts}
 
     def __iter__(self):
+        """
+        Iterate over the points.
+        """
         return np.ndindex(self.size)
 
+    def __iadd__(self, shift):
+        """
+        Shift the pts by shift. Periodic boundary condition is assumed.
+        """
+        self.qubits = {v + Point(shift): self.qubits[v] for v in self.pts}
+        self.pts = [(pt + Point(shift)) % self.size for pt in self.pts]
+        return self
+    
     @property
     def size(self):
+        """
+        Size in each directions.
+        """
         return Point([max([pt[i] for pt in self.pts]) + 1 for
                       i in range(self.d)])
 
     @property
-    def qubits(self):
-        return {v: Qubit(v) for v in self.pts}
-
-    @property
     def d(self):
+        """
+        Dimension.
+        """
         return dim_spatial(self.pts[0])
 
     def draw(self, *v_sublattice):
@@ -112,7 +127,7 @@ class Lattice():
         plt.show()
 
     def sublattice(self, *v):
-        return [pt for pt in self.pts if pt % v]
+        return [pt for pt in self.pts if is_zero(pt % v)]
 
     def fine_grain(self, *blowup_factor):
         """
@@ -152,3 +167,9 @@ def dim_spatial(size):
         return len(size)
     else:
         raise TypeError("Input should be an integer or a tuple of integers.")
+
+def is_zero(coordinate):
+    for n in range(len(coordinate)):
+        if coordinate[n] != 0:
+            return False
+    return True
