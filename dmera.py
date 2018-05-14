@@ -17,7 +17,6 @@
 from circuit import circuit
 from lattice import Lattice
 
-
 class DMERA1(circuit):
     """
     This is a DMERA circuit ansatz for quantum many-body systems in
