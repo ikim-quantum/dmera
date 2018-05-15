@@ -25,7 +25,7 @@ class Point(tuple):
         Points on a square lattice. Inherited from the tuple class.
         """
         self = tuple(v)
-    
+
     def __mul__(self, other):
         """
         Elementwise multiplication.
@@ -33,12 +33,12 @@ class Point(tuple):
         Args:
             self (Point): self.
             other (tuple): Other Point/tuple instance.
-        
+
         Returns:
             (Point): Elementwise multiplication of self and other.
 
         Example:
-            Suppose we have a Point instance called pt=Point((2,3,4)). 
+            Suppose we have a Point instance called pt=Point((2,3,4)).
 
             >>> pt * (1, 2, 3)
             (2, 6, 12)
@@ -59,7 +59,7 @@ class Point(tuple):
             other (tuple): Other Point/tuple instance.
 
         Example:
-            Suppose we have a Point instance called pt=Point((2,3,4)). 
+            Suppose we have a Point instance called pt=Point((2,3,4)).
 
             >>> pt *= (1, 2, 3)
             >>> print(pt)
@@ -77,7 +77,7 @@ class Point(tuple):
             other (tuple): Other Point/tuple instance.
 
         Example:
-            Suppose we have a Point instance called pt=Point((2,3,4)). 
+            Suppose we have a Point instance called pt=Point((2,3,4)).
 
             >>> pt % (1, 2, 3)
             (0, 1, 1)
@@ -93,7 +93,7 @@ class Point(tuple):
             other (tuple): Other Point/tuple instance.
 
         Example:
-            Suppose we have a Point instance called pt=Point((2,3,4)). 
+            Suppose we have a Point instance called pt=Point((2,3,4)).
 
             >>> pt %= (1, 2, 3)
             >>> print(pt)
@@ -111,7 +111,7 @@ class Point(tuple):
             other (tuple): Other Point/tuple instance.
 
         Example:
-            Suppose we have a Point instance called pt=Point((2,3,4)). 
+            Suppose we have a Point instance called pt=Point((2,3,4)).
 
             >>> pt + (1, 2, 3)
             (3, 5, 7)
@@ -127,7 +127,7 @@ class Point(tuple):
             other (tuple): Other Point/tuple instance.
 
         Example:
-            Suppose we have a Point instance called pt=Point((2,3,4)). 
+            Suppose we have a Point instance called pt=Point((2,3,4)).
 
             >>> pt += (1, 2, 3)
             >>> print(pt)
@@ -145,7 +145,7 @@ class Point(tuple):
             other (tuple): Other Point/tuple instance.
 
         Example:
-            Suppose we have a Point instance called pt=Point((2,3,4)). 
+            Suppose we have a Point instance called pt=Point((2,3,4)).
 
             >>> pt - (1, 2, 3)
             (1, 1, 1)
@@ -161,7 +161,7 @@ class Point(tuple):
             other (tuple): Other Point/tuple instance.
 
         Example:
-            Suppose we have a Point instance called pt=Point((2,3,4)). 
+            Suppose we have a Point instance called pt=Point((2,3,4)).
 
             >>> pt -= (1, 2, 3)
             >>> print(pt)
@@ -181,7 +181,7 @@ class Lattice():
             size(list of int): length of the lattice in each directions
 
         Examples:
-            The following code will create an instance my_lattice, whose size 
+            The following code will create an instance my_lattice, whose size
             is 2 x 3.
 
             >>> my_lattice = Lattice(2, 3)
@@ -216,50 +216,65 @@ class Lattice():
         """
         Shift the qubits by shift. Periodic boundary condition is assumed.
 
-        Args: 
+        Args:
             shift(list of int): Lattice vector for the shift.
 
         Returns:
-            Lattice : New lattice instance. The qubit at pt is the qubit at pt+shift
-                      in the original instance.
+            Lattice : New lattice instance. The qubit at pt is the qubit at pt
+                      + shift in the original instance.
 
         Examples:
-            Let's say we create a Lattice instance with dimension 3 x 2, and a new 
-            lattice that is shifted by a vector (1, 1).
+            Let's say we create a Lattice instance with dimension 3 x 2, and a
+            new lattice that is shifted by a vector (1, 1).
 
             >>> my_lattice = Lattice(3, 2)
             >>> new_lattice = my_lattice + (1, 1)
 
 
-            These two lattices contain the same lattice points. However, the assignment
-            of the qubit is different. 
+            These two lattices contain the same lattice points. However, the
+            assignment of the qubit is different.
 
             >>> my_lattice.qubits[0,0] == new_lattice.qubits[0,0]
             False
 
 
-            This is because the new_lattice is shifted by (1,1). Once we account for this
-            shift, one can see that the qubits can be identified with each other. 
+            This is because the new_lattice is shifted by (1,1). Once we
+            account for this shift, one can see that the qubits can be
+            identified with each other.
 
             >>> my_lattice.qubits[1,1] == new_lattice.qubits[0,0]
             True
         """
         out = Lattice()
-        out.qubits = {(v + Point(shift)) % self.size: self.qubits[v] for v in self.pts}
+        out.qubits = {(v + Point(shift)) %
+                      self.size: self.qubits[v] for v in self.pts}
         out.pts = [pt for pt in self.pts]
         return out
 
     def __iadd__(self, shift):
         """
-        Shift the qubits by shift. Periodic boundary condition is assumed.
+        Shift the qubits by shift. Periodic boundary condition is assumed. See
+        __add__ for the details/examples.
+
+        Args:
+            shift(list of int): Lattice vector for the shift.
         """
-        self.qubits = {(v + Point(shift)) % self.size: self.qubits[v] for v in self.pts}
+        self.qubits = {(v + Point(shift)) %
+                       self.size: self.qubits[v] for v in self.pts}
         return self
-    
+
     @property
     def size(self):
         """
-        Size in each directions.
+        Returns the size of the lattice.
+
+        Returns:
+            tuple: length of the lattice in each directions.
+
+        Example:
+            >>> my_lattice = Lattice(2,3,4)
+            >>> my_lattice.size
+            (2, 3, 4)
         """
         return Point([max([pt[i] for pt in self.pts]) + 1 for
                       i in range(self.d)])
@@ -267,15 +282,43 @@ class Lattice():
     @property
     def d(self):
         """
-        Dimension.
+        Returns the dimension of the lattice.
+
+        Returns:
+            int: Dimension of the lattice.
+
+        Examples:
+            >>> my_lattice = Lattice(3,6,5)
+            >>> my_lattice.d
+            3
+            >>> my_lattice = Lattice(4,4)
+            >>> my_lattice.d
+            2
         """
         return dim_spatial(self.pts[0])
 
     def draw(self, *v_sublattice):
         """
         Draws lattice. Only works for 2D lattice.
-        """
 
+        Args:
+            v_sublattice(tuple of int): The lattice vector that defines a
+                                        sublattice. The first component is
+                                        x component, and the second component
+                                        is the y component.
+
+        Examples:
+            The following command draws a 4 x 4 lattice. Sites with even
+            x coordinate are colored as blue. Sites with odd x coordinate are
+            colored as red.
+
+            >>> my_lattice = Lattice(4,4)
+            >>> my_lattice.draw(2,1)
+
+            The coloring pattern changes depending on the input. In the
+            following example, sites with even y coordinate are colored as
+            blue. Sites with odd y coordinate are colored as red.
+        """
         try:
             if self.d == 1:
                 for site in self.restrict(*v_sublattice):
@@ -303,6 +346,14 @@ class Lattice():
         Returns a Lattice instance which only contains these lattice points.
         The qubits of the new instance correspond to the qubits of the original
         instance.
+
+        Args:
+            v (tuple): A lattice vector that defines a sublattice.
+
+        Returns:
+            Lattice: Returns a restricted lattice, whose points are integer
+                     multiples of v. The qubits of this instance is identified
+                     with the qubits of the original instance.
         """
         slattice = Lattice()
         slattice.pts = [Point(pt) for pt in self.pts if is_zero(pt % v)]
@@ -315,6 +366,17 @@ class Lattice():
         Returns a Lattice instance which are expanded by the blowup_factor.
         The qubits of the original instance is used as some of the qubits
         of the new instance. New qubits are created as well.
+
+        Args:
+            blowup_factor (tuple): A factor by which each direction is blown
+            up.
+
+        Returns:
+            Lattice: Returns an expanded lattice. The points in the original
+                     instance is blown up by the blowup_factor. Missing sites
+                     between these sites is filled up. The qubits on the blown
+                     up sites are identified with the qubits of the original
+                     instance. For the new sites, new qubits are created.
         """
         if isinstance(blowup_factor, int):
             factor = tuple([blowup_factor for i in range(self.d)])
@@ -339,6 +401,15 @@ class Lattice():
 
 
 def dim_spatial(size):
+    """
+    Returns a number of spatial dimensions.
+
+    Args:
+        size (tuple): Integer-valued tuple which specifies the size.
+
+    Returns:
+        int: Number of spatial dimensions.
+    """
     if isinstance(size, int):
         return 1
     elif isinstance(size, tuple):
@@ -351,7 +422,17 @@ def dim_spatial(size):
     else:
         raise TypeError("Input should be an integer or a tuple of integers.")
 
+
 def is_zero(coordinate):
+    """
+    Checks if the coordinate(specified in terms of a tuple) is at the origin.
+
+    Args:
+        coordinate (tuple): Input coordinate.
+
+    Returns:
+        bool: True if coordinate is at the origin, False otherwise.
+    """
     for n in range(len(coordinate)):
         if coordinate[n] != 0:
             return False
