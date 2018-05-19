@@ -14,10 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from circuit import circuit
+from circuit import Circuit
 from lattice import Lattice
 
-class DMERA1(circuit):
+class DMERA1(Circuit):
     """
     This is a DMERA circuit ansatz for quantum many-body systems in
     one spatial dimension.
@@ -31,17 +31,12 @@ class DMERA1(circuit):
             scales (int): Number of qubits = 2 ** scales
             depth (int): Depth per scale
         """
+        unitsize = 2 * depth
+        self.lattices = [Lattice(unitsize)]
+        for scale in range(1, scales):
+            self.lattices.append(self.lattices[-1].expand(2))
+        
 
-        number_of_qubits = 2 ** scales
-
-    def fine_grain(self, unit_coarse, unit_fine):
-        """
-        Fine-grain DMERA
-
-        Args:
-            unit_coarse (int): unit interval(coarse scale)
-            unit_fine (int): unit interval(finer scale)
-        """
 
 
 class Slice(circuit):

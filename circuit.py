@@ -15,7 +15,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import gate as gt
-
+from lattice import Lattice
+# TODO
+# Add a class method for appending a single slice of translationally invariant
+# circuit
+# Add a class method for embedding the existing circuit into a larger circuit.
 
 class Circuit(list):
     """
