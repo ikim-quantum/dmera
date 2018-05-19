@@ -23,7 +23,7 @@ class DMERA1(Circuit):
     one spatial dimension.
     """
 
-    def __init__(self, scales=0, depth=0):
+    def __init__(self, scale=0, depth=0):
         """
         Initializes the instance with a DMERA with identity gates.
 
@@ -31,10 +31,24 @@ class DMERA1(Circuit):
             scales (int): Number of qubits = 2 ** scales
             depth (int): Depth per scale
         """
-        unitsize = 2 * depth
-        self.lattices = [Lattice(unitsize)]
-        for scale in range(1, scales):
-            self.lattices.append(self.lattices[-1].expand(2))
+        self.D = depth
+        self.n = scale
+        self.lattice = Lattice()
+
+    def expand(self, factor):
+        """
+        Expands the underlying lattice by a factor. Add preparation
+        gates for the newly introduced qubits.
+        """
+        new_lattice = self.lattice.expand(factor)
+        pts_new = list(set(new_lattice.pts) - set(self.lattice.pts))
+        self.extend([Prepare(self.qubits[v]) for v in pts_new])
+
+    def entangle(self):
+        """
+        Entangle the degrees of freedom in the current lengthscale.
+        Apply a depth self.D quantum circuit.
+        """
         
 
 
