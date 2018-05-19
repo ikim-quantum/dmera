@@ -16,10 +16,6 @@
 
 import gate as gt
 from lattice import Lattice
-# TODO
-# Add a class method for appending a single slice of translationally invariant
-# circuit
-# Add a class method for embedding the existing circuit into a larger circuit.
 
 class Circuit(list):
     """
@@ -38,7 +34,7 @@ class Circuit(list):
         self.extend(input_circuit)
 
     @classmethod
-    def singles(cls, qubits, unitary):
+    def singles(cls, qubits, unitary=None):
         """
         Creates an instance of a single-slice circuit that applies unitary
         to the qubits
@@ -53,7 +49,7 @@ class Circuit(list):
         return Circuit([gt.Gate(qubit, unitary) for qubit in qubits])
 
     @classmethod
-    def doubles(cls, qubits_c, qubits_t, unitary):
+    def doubles(cls, qubits_c, qubits_t, unitary=None):
         """
         Creates an instance of a circuit that applies unitary to the two
         qubits.
@@ -263,7 +259,7 @@ class Circuit(list):
         * Past causal cone refers to an ordered list of gates that can
         influence the reduced density matrix of the observables of the
         qubits. Every circuit element outside the past causal cone has
-        absolutely no influence on such observables.
+        absolutely no influence on the observable.
 
         Args:
             qubits: Qubits of interest
