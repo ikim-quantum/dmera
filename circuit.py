@@ -270,7 +270,13 @@ class Circuit(list):
         tracked_qubits = qubits
         my_pcc = Circuit()
         for gate in reversed(self):
-            if gate.has_qubits(qubits):
-                tracked_qubits += gate.qubits
-                my_pcc.append(gate)
+            if isinstance(gate, gt.Gate) or isinstance(gate, gt.Measure):
+                if gate.has_qubits(qubits):
+                    tracked_qubits += gate.qubits
+                    my_pcc.append(gate)
+            elif isinstance(gate, gt.Prepare):
+                if gate.has_qubits(qubits):
+                    for qubit in gate.qubits:
+                        tracked_qubits.remove(qubit)
+                    my_pcc.append(gate)
         return my_pcc[::-1]
