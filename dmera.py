@@ -17,6 +17,38 @@
 from circuit import Circuit
 from lattice import Lattice
 
+class DMERA(Circuit):
+    def __init__(self, scale=0, depth=0, *unit):
+        self.n = scale
+        self.D = depth
+        self.lattice = Lattice(unit)
+        
+        self.extend([Prepare(qubit) for qubit in self.lattice.qubits.value()])
+            
+
+        for s in self.n:
+            old_lattice = self.lattice
+            new_lattice = self.lattice.expand(2)
+            new_qubits = list(set(new_lattice.qubits.values()) - set(old_lattice.qubits.value()))
+            self.extend([Prepare(qubit) for qubit in new_qubits])
+
+    def expand(self):
+        self.n += 1
+        self.lattice.expand(2)
+
+    @property
+    def idle_qubits(self):
+        """
+        Returns a list of qubits which are in the lattice but not in the circuit.
+        """
+        return [qubit for qubit in self.lattice.]
+
+    def prepare(self):
+        """
+        Prepare qubits that are not prepared yet.
+        """
+        
+
 class DMERA1(Circuit):
     """
     This is a DMERA circuit ansatz for quantum many-body systems in
