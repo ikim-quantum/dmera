@@ -16,67 +16,53 @@
 
 from circuit import Circuit
 from lattice import Lattice
+import gate as gt
 
 class DMERA(Circuit):
-    def __init__(self, scale=0, depth=0, *unit):
-        self.n = scale
+    def __init__(self, depth, scale, *unit):
+        super().__init__()
         self.D = depth
+        self.n = scale
         self.lattice = Lattice(unit)
-        
-        self.extend([Prepare(qubit) for qubit in self.lattice.qubits.value()])
-            
 
         for s in self.n:
-            old_lattice = self.lattice
-            new_lattice = self.lattice.expand(2)
-            new_qubits = list(set(new_lattice.qubits.values()) - set(old_lattice.qubits.value()))
-            self.extend([Prepare(qubit) for qubit in new_qubits])
-
-    def expand(self):
-        self.n += 1
-        self.lattice.expand(2)
+            self.expand(2)
+            for d in self.D:
+                self.entangle_nn()
 
     @property
     def idle_qubits(self):
         """
         Returns a list of qubits which are in the lattice but not in the circuit.
         """
-        return [qubit for qubit in self.lattice.]
+        qubits_lattice = self.lattice.qubits.values()
+        qubits_circuit = self.qubits
+        return [qubit for qubit in qubits_lattice if qubit not in qubits_circuit]
 
-    def prepare(self):
+    def initialize_idle_qubits(self):
         """
-        Prepare qubits that are not prepared yet.
+        Initialize idle qubits.
         """
-        
+        self.extend([gt.Prepare(qubit) for qubit in self.idle_qubits])
 
-class DMERA1(Circuit):
-    """
-    This is a DMERA circuit ansatz for quantum many-body systems in
-    one spatial dimension.
-    """
-
-    def __init__(self, scales=0, depth=0):
+    def expand(self, factor):
         """
-        Initializes the instance with a DMERA with identity gates.
-
-        Args:
-            scales (int): Number of qubits = 2 ** scales
-            depth (int): Depth per scale
+        Expand the lattice and intialize the newly introduced qubits.
         """
-        unitsize = 2 * depth
-        self.lattices = [Lattice(unitsize)]
-        for scale in range(1, scales):
-            self.lattices.append(self.lattices[-1].expand(2))
-        
+        self.lattice.expand(factor)
+        self.initialize_idle_qubits()
 
+    def entangle_nn(self, unitary=None):
+        """
+        Entangle nearest neighbors.
+        """
+        dim = self.lattice.d
+        # Create unit vectors in each directions.
 
+        # Iterate over:
+        # Create sublattice in each directions.
 
-class Slice(circuit):
-    """
-    Single-depth quantum circuit. Translationally invariant. Specified by
-    a single two-qubit gate.
-    """
+        # Make a list of qubits on the sublattice and the shifted sublattice.
 
-    def __init__(self, my_lattice):
-        if not isinstance(my_lattice, Lattice):
-            raise TypeError("Input for LDQC __init__ must be a Lattice.")
+        # Add entangling gates.
+        self.extend(Circuit.doubles(family1, family2, unitary))
