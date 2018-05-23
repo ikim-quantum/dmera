@@ -263,6 +263,57 @@ class Lattice():
                        self.size: self.qubits[v] for v in self.pts}
         return self
 
+    def __sub__(self, shift):
+        """
+        Shift the qubits by -shift. Periodic boundary condition is assumed.
+
+        Args:
+            shift(list of int): Lattice vector for the shift.
+
+        Returns:
+            Lattice : New lattice instance. The qubit at pt is the qubit at pt
+                      + shift in the original instance.
+
+        Examples:
+            Let's say we create a Lattice instance with dimension 3 x 2, and a
+            new lattice that is shifted by a vector (-1, -1).
+
+            >>> my_lattice = Lattice(3, 2)
+            >>> new_lattice = my_lattice - (1, 1)
+
+
+            These two lattices contain the same lattice points. However, the
+            assignment of the qubit is different.
+
+            >>> my_lattice.qubits[0,0] == new_lattice.qubits[0,0]
+            False
+
+
+            This is because the new_lattice is shifted by (1,1). Once we
+            account for this shift, one can see that the qubits can be
+            identified with each other.
+
+            >>> my_lattice.qubits[0,0] == new_lattice.qubits[1,1]
+            True
+        """
+        out = Lattice()
+        out.qubits = {(v - Point(shift)) %
+                      self.size: self.qubits[v] for v in self.pts}
+        out.pts = [pt for pt in self.pts]
+        return out
+
+    def __isub__(self, shift):
+        """
+        Shift the qubits by -shift. Periodic boundary condition is assumed. See
+        __sub__ for the details/examples.
+
+        Args:
+            shift(list of int): Lattice vector for the shift.
+        """
+        self.qubits = {(v - Point(shift)) %
+                       self.size: self.qubits[v] for v in self.pts}
+        return self
+
     @property
     def size(self):
         """
@@ -399,6 +450,61 @@ class Lattice():
             elattice.qubits[v] = Qubit(v)
         return elattice
 
+    def nnpairs(self):
+        """
+        Returns pairs of nearest neighbors.
+
+        Returns:
+            list: The element of the list is another list,
+                  which is a pair of lattice instances. The first
+                  lattice in the pair is a sublattice, and the 
+                  second lattice is a sublattice shifted by a unit
+                  vector.
+        """
+        pairs = []
+        for direction in range(self.d):
+            vec = unit_vector(direction, self.d)
+            ones = one_vector(self.d)
+            mymod = vec + ones
+            first = self.restrict(*mymod)
+            shifted = self - vec
+            second = shifted.restrict(*mymod)
+            shift2 = self + vec
+            third = shift2.restrict(*mymod)
+            pairs.append([first, second])
+            pairs.append([first, third])
+        return pairs
+
+def one_vector(dim):
+    """
+    Returns a Point instance that has 1s.
+
+    Args:
+        dim (int): Number of spatial dimensions.
+
+    Returns:
+        Point: Unit vector of length (dim), filled with 1s.
+    """
+    return Point([1] * dim)
+    
+def unit_vector(direction, dim):
+    """
+    Returns a Point instance that represents a unit vector.
+
+    Args:
+        direction (int): The direction of the unit vector.
+        dim (int): Number of spatial dimensions.
+
+    Returns:
+        Point: Unit vector in the direction.
+
+    Example:
+        >>> unit_vector(3, 5)
+        (0, 0, 0, 1, 0)
+    """
+    out = [0] * dim
+    out[direction] = 1
+    return Point(out)
 
 def dim_spatial(size):
     """
