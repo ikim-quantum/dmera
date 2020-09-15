@@ -16,169 +16,22 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-from qubit import Qubit
-
-
-class Point(tuple):
-    def __init__(self, *v):
-        """
-        Points on a square lattice. Inherited from the tuple class.
-        """
-        self = tuple(v)
-
-    def __mul__(self, other):
-        """
-        Elementwise multiplication.
-
-        Args:
-            self (Point): self.
-            other (tuple): Other Point/tuple instance.
-
-        Returns:
-            (Point): Elementwise multiplication of self and other.
-
-        Example:
-            Suppose we have a Point instance called pt=Point((2,3,4)).
-
-            >>> pt * (1, 2, 3)
-            (2, 6, 12)
-        """
-        if isinstance(other, int):
-            return Point([n * other for n in self])
-        elif isinstance(other, tuple):
-            return Point([n * factor for n, factor in zip(self, other)])
-
-    __rmul__ = __mul__
-
-    def __imul__(self, other):
-        """
-        Elementwise multiplication.
-
-        Args:
-            self (Point): self.
-            other (tuple): Other Point/tuple instance.
-
-        Example:
-            Suppose we have a Point instance called pt=Point((2,3,4)).
-
-            >>> pt *= (1, 2, 3)
-            >>> print(pt)
-            (2, 6, 12)
-        """
-        self = self * other
-        return self
-
-    def __mod__(self, other):
-        """
-        Elementwise %.
-
-        Args:
-            self (Point): self.
-            other (tuple): Other Point/tuple instance.
-
-        Example:
-            Suppose we have a Point instance called pt=Point((2,3,4)).
-
-            >>> pt % (1, 2, 3)
-            (0, 1, 1)
-        """
-        return Point([i % j for i, j in zip(self, other)])
-
-    def __imod__(self, other):
-        """
-        Elementwise %.
-
-        Args:
-            self (Point): self.
-            other (tuple): Other Point/tuple instance.
-
-        Example:
-            Suppose we have a Point instance called pt=Point((2,3,4)).
-
-            >>> pt %= (1, 2, 3)
-            >>> print(pt)
-            (0, 1, 1)
-        """
-        self = self % other
-        return self
-
-    def __add__(self, other):
-        """
-        Elementwise addition.
-
-        Args:
-            self (Point): self.
-            other (tuple): Other Point/tuple instance.
-
-        Example:
-            Suppose we have a Point instance called pt=Point((2,3,4)).
-
-            >>> pt + (1, 2, 3)
-            (3, 5, 7)
-        """
-        return Point([i + j for i, j in zip(self, other)])
-
-    def __iadd__(self, other):
-        """
-        Elementwise addition.
-
-        Args:
-            self (Point): self.
-            other (tuple): Other Point/tuple instance.
-
-        Example:
-            Suppose we have a Point instance called pt=Point((2,3,4)).
-
-            >>> pt += (1, 2, 3)
-            >>> print(pt)
-            (3, 5, 7)
-        """
-        self = self + other
-        return self
-
-    def __sub__(self, other):
-        """
-        Elementwise subtraction.
-
-        Args:
-            self (Point): self.
-            other (tuple): Other Point/tuple instance.
-
-        Example:
-            Suppose we have a Point instance called pt=Point((2,3,4)).
-
-            >>> pt - (1, 2, 3)
-            (1, 1, 1)
-        """
-        return Point([i - j for i, j in zip(self, other)])
-
-    def __isub__(self, other):
-        """
-        Elementwise subtraction.
-
-        Args:
-            self (Point): self.
-            other (tuple): Other Point/tuple instance.
-
-        Example:
-            Suppose we have a Point instance called pt=Point((2,3,4)).
-
-            >>> pt -= (1, 2, 3)
-            >>> print(pt)
-            (1, 1, 1)
-        """
-        self = self - other
-        return self
+from qubit.qubit import Qubit
 
 
 class Lattice():
+    """
+    Attrs:
+        pts(list of np.ndarray): A list of (integer-valued) coordinates.
+        qubits(dict of tuple: Qubit): Qubits on each lattice points.
+    """
     def __init__(self, *args):
         """
         Generates a lattice of size l_1 x l_2 x ... for size = (l_1, l_2,
         ...). Each lattice site contains a qubit.
 
         Args:
-            size(list of int): length of the lattice in each directions
+            tuple(int): lengths of the lattice in each directions
 
         Examples:
             The following code will create an instance my_lattice, whose size
@@ -189,8 +42,8 @@ class Lattice():
             [(0,0), (0,1), (0,2), (1,0), (1,1), (1,2)]
         """
         if args:
-            self.pts = [Point(loc) for loc in np.ndindex(args)]
-            self.qubits = {v: Qubit(v) for v in self.pts}
+            self.pts = [np.array(loc) for loc in np.ndindex(args)]
+            self.qubits = {tuple(v): Qubit(v) for v in self.pts}
         else:
             self.pts = []
             self.qubits = {}
@@ -246,8 +99,8 @@ class Lattice():
             True
         """
         out = Lattice()
-        out.qubits = {(v + Point(shift)) %
-                      self.size: self.qubits[v] for v in self.pts}
+        out.qubits = {tuple((v + np.array(shift)) %
+                      self.size): self.qubits[tuple(v)] for v in self.pts}
         out.pts = [pt for pt in self.pts]
         return out
 
@@ -259,8 +112,8 @@ class Lattice():
         Args:
             shift(list of int): Lattice vector for the shift.
         """
-        self.qubits = {(v + Point(shift)) %
-                       self.size: self.qubits[v] for v in self.pts}
+        self.qubits = {tuple((v + np.array(shift)) %
+                       self.size): self.qubits[tuple(v)] for v in self.pts}
         return self
 
     def __sub__(self, shift):
@@ -297,8 +150,8 @@ class Lattice():
             True
         """
         out = Lattice()
-        out.qubits = {(v - Point(shift)) %
-                      self.size: self.qubits[v] for v in self.pts}
+        out.qubits = {tuple((v - np.array(shift)) %
+                      self.size): self.qubits[tuple(v)] for v in self.pts}
         out.pts = [pt for pt in self.pts]
         return out
 
@@ -310,8 +163,8 @@ class Lattice():
         Args:
             shift(list of int): Lattice vector for the shift.
         """
-        self.qubits = {(v - Point(shift)) %
-                       self.size: self.qubits[v] for v in self.pts}
+        self.qubits = {tuple((v - np.array(shift)) %
+                       self.size): self.qubits[tuple(v)] for v in self.pts}
         return self
 
     @property
@@ -327,7 +180,7 @@ class Lattice():
             >>> my_lattice.size
             (2, 3, 4)
         """
-        return Point([max([pt[i] for pt in self.pts]) + 1 for
+        return np.array([max([pt[i] for pt in self.pts]) + 1 for
                       i in range(self.d)])
 
     @property
@@ -346,7 +199,7 @@ class Lattice():
             >>> my_lattice.d
             2
         """
-        return dim_spatial(self.pts[0])
+        return len(self.pts[0])
 
     def draw(self, *v_sublattice):
         """
@@ -407,8 +260,8 @@ class Lattice():
                      with the qubits of the original instance.
         """
         slattice = Lattice()
-        slattice.pts = [Point(pt) for pt in self.pts if is_zero(pt % v)]
-        slattice.qubits = {v: self.qubits[v] for v in slattice.pts}
+        slattice.pts = [np.array(pt) for pt in self.pts if is_zero(pt % v)]
+        slattice.qubits = {v: self.qubits[tuple(v)] for v in slattice.pts}
         return slattice
 
     def expand(self, *blowup_factor):
@@ -434,20 +287,20 @@ class Lattice():
         else:
             factor = tuple(blowup_factor)
         # set of new points
-        pts = [Point(loc) for loc in np.ndindex(self.size * factor)]
+        pts = [np.array(loc) for loc in np.ndindex(self.size * factor)]
         pts_inherited = [v * factor for v in self.pts]
         pts_new = [loc for loc in pts if loc not in pts_inherited]
 
         # embed the old qubits to a new lattice
         elattice = Lattice()
         elattice.pts = pts
-        elattice.qubits = {v * factor: self.qubits[v] for v in self.pts}
+        elattice.qubits = {v * factor: self.qubits[tuple(v)] for v in self.pts}
         # change the label_circuit for the old qubits
         for v in pts_inherited:
-            elattice.qubits[v].label_circuit = v
+            elattice.qubits[tuple(v)].label_circuit = v
         # introduce the new qubits
         for v in pts_new:
-            elattice.qubits[v] = Qubit(v)
+            elattice.qubits[tuple(v)] = Qubit(v)
         return elattice
 
     def nnpairs(self):
@@ -477,7 +330,7 @@ class Lattice():
 
 def one_vector(dim):
     """
-    Returns a Point instance that has 1s.
+    Returns a np.array instance that has 1s.
 
     Args:
         dim (int): Number of spatial dimensions.
@@ -485,7 +338,7 @@ def one_vector(dim):
     Returns:
         Point: Unit vector of length (dim), filled with 1s.
     """
-    return Point([1] * dim)
+    return np.array([1] * dim)
     
 def unit_vector(direction, dim):
     """
@@ -504,30 +357,7 @@ def unit_vector(direction, dim):
     """
     out = [0] * dim
     out[direction] = 1
-    return Point(out)
-
-def dim_spatial(size):
-    """
-    Returns a number of spatial dimensions.
-
-    Args:
-        size (tuple): Integer-valued tuple which specifies the size.
-
-    Returns:
-        int: Number of spatial dimensions.
-    """
-    if isinstance(size, int):
-        return 1
-    elif isinstance(size, tuple):
-        for n in size:
-            if not isinstance(n, int):
-                raise TypeError("The size should be specified as integers.")
-            elif n < 0:
-                return ValueError("Integer is negative.")
-        return len(size)
-    else:
-        raise TypeError("Input should be an integer or a tuple of integers.")
-
+    return np.array(out)
 
 def is_zero(coordinate):
     """

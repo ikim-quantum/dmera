@@ -1,0 +1,9 @@
+* TODO:
+  - Test expand and restrict method in the Lattice class.
+* Progress
+  - <2020-09-15 Tue 19:16>
+    + Reorganized the repo
+    + Replaced Point class with np.ndarray. (I think this is cleaner)
+    + Shift tested
+
+                 
