@@ -1,9 +1,11 @@
 * TODO:
   - Test expand and restrict method in the Lattice class.
+    + The current issue is line 292. loc is np.ndarray and we cannot
+      reliably check if it belongs to pts_inherited(list).
 * Progress
   - <2020-09-15 Tue 19:16>
     + Reorganized the repo
     + Replaced Point class with np.ndarray. (I think this is cleaner)
     + Shift tested
 
-                 
+          
