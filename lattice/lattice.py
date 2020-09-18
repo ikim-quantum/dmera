@@ -261,7 +261,7 @@ class Lattice():
         """
         slattice = Lattice()
         slattice.pts = [np.array(pt) for pt in self.pts if is_zero(pt % v)]
-        slattice.qubits = {v: self.qubits[tuple(v)] for v in slattice.pts}
+        slattice.qubits = {tuple(v): self.qubits[tuple(v)] for v in slattice.pts}
         return slattice
 
     def expand(self, *blowup_factor):
@@ -287,14 +287,14 @@ class Lattice():
         else:
             factor = tuple(blowup_factor)
         # set of new points
-        pts = [np.array(loc) for loc in np.ndindex(self.size * factor)]
+        pts = [np.array(loc) for loc in np.ndindex(*tuple(self.size * factor))]
         pts_inherited = [v * factor for v in self.pts]
         pts_new = [loc for loc in pts if loc not in pts_inherited]
 
         # embed the old qubits to a new lattice
         elattice = Lattice()
         elattice.pts = pts
-        elattice.qubits = {v * factor: self.qubits[tuple(v)] for v in self.pts}
+        elattice.qubits = {tuple(v * factor): self.qubits[tuple(v)] for v in self.pts}
         # change the label_circuit for the old qubits
         for v in pts_inherited:
             elattice.qubits[tuple(v)].label_circuit = v
